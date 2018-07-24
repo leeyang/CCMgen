@@ -1,3 +1,6 @@
+##This version is very different from the original version
+##it allows regularization matrix settings
+
 # CCMgen and CCMpredPy
 
 This repository provides a Python toolkit for learning second-order Markov Random Field (MRF) models from multiple sequence alignments of a protein families and using these models for generating realistic synthetic protein sequences. 
@@ -41,7 +44,7 @@ Please check out the [GitHub releases page for CCMgen](https://github.com/soedin
 To clone the latest development version of CCMgen/CCMpredPy, please use the following command line:
 
 ```bash
-git clone https://github.com/soedinglab/ccmgen.git
+git clone https://github.com/leeyang/ccmgen.git
 ```
 
 ## Installation
@@ -59,12 +62,12 @@ pip install .
 Alternatively, you can install the latest development version of CCMgen/CCMpredPy with `pip` directly from this repository:
 
 ```bash
-pip install git+https://github.com/soedinglab/ccmgen@master
+pip install git+https://github.com/leeyang/ccmgen@master
 ```
 and keep updated with:
 
 ```bash
-pip install git+https://github.com/soedinglab/ccmgen@master --upgrade
+pip install git+https://github.com/leeyang/ccmgen@master --upgrade
 ```
 ## Uninstall
 
