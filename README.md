@@ -1,5 +1,4 @@
-##This version is very different from the original version
-##it allows regularization matrix settings
+
 
 # CCMgen and CCMpredPy
 
@@ -9,7 +8,8 @@ CCMpredPy is a fast implementation of an evolutionary coupling method for learni
 While state-of-the-art pseudo-likelihood models have consistenly been found to work best for the purpose of predicting residue-residue contacts, models learned with persistent contrastive divergence are much more accurate in their fine statistics and are recommended for the use with CCMgen to generate realistic sequence samples.
 
 CCMgen is a tool for sampling protein-like sequences from a second-order Markov Randon Field (MRF) model, such as it can be learned with CCMpredPy. The residues of generated sequences will obey the selection pressures described by the MRF with pairwise statistical couplings between residue positions. Furthermore, CCMgen provides full control over the generation of the synthetic alignment by allowing to specify the evolutionary times and phylogeny along which the sequences are sampled.
-
+##This version is very different from the original version
+##it allows regularization matrix settings
 ## Citation
 
 Susann Vorberg, Stefan Seemayer and Johannes Soeding, Synthetic protein alignments by CCMgen quantify noise in residue-residue contact prediction, bioRxiv, doi: [10.1101/344333](https://doi.org/10.1101/344333) (2018).
