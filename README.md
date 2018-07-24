@@ -76,8 +76,12 @@ The CCMgen/CCmpredPy toolkit can be uninstalled with:
 ```bash
 pip uninstall ccmgen
 ```
-
-
+## usage in python
+go to scripts
+```python
+import run_ccmpred
+run_ccmpred.run(alnfile,apcfile,reg_matrix)
+```
 
 ## Next Steps
 Now you're ready to use CCMgen and CCMpredPy! You can have a look at the [getting started guide](https://github.com/soedinglab/CCMgen/wiki/Getting-Started-with-CCMgen-and-CCMpredPy) to learn how to use both tools.
