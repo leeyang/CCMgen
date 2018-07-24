@@ -13,7 +13,7 @@ import ccmpred.centering
 import ccmpred.raw
 import ccmpred.parameter_handling
 import ccmpred.sanity_check
-from ccmpred.regularization import L2
+from ccmpred.regularization import L2,L3
 import ccmpred.plotting
 import ccmpred.sampling
 import ccmpred.weighting
@@ -71,7 +71,9 @@ class CCMpred():
         self.single_prior = None
         self.single_potential_init = None
         self.pair_potential_init = None
-
+        #######################################add by yangli 180724#########################################
+        self.reg_matrix = None
+        ####################################################################################################
         #variables
         self.x_single = None
         self.x_pair = None
@@ -377,7 +379,7 @@ class CCMpred():
             'correction': "no"
         }
 
-    def specify_regularization(self, lambda_single, lambda_pair_factor,
+    def specify_regularization(self, lambda_single, lambda_pair_factor,pair_mat,
                                reg_type="L2", scaling="L", single_prior="v-center"):
         """
 
@@ -406,7 +408,7 @@ class CCMpred():
             multiplier = 1
 
         if reg_type == "L2":
-            self.regularization = L2(lambda_single, lambda_pair_factor, multiplier, prior_v_mu)
+            self.regularization = L3(lambda_single, lambda_pair_factor, multiplier, prior_v_mu,pair_mat)
 
 
     def intialise_potentials(self):
@@ -463,8 +465,8 @@ class CCMpred():
             print("Plot with optimization statistics will be written to {0}".format(plot_file))
             self.progress.set_plot_file(plot_file)
 
-    def minimize(self, opt, plotfile=None):
-
+    def minimize(self, opt=None, plotfile=None):
+        '''
         OBJ_FUNC = {
             "pll": lambda opt: pll.PseudoLikelihood(
                 self.msa, self.weights, self.regularization, self.pseudocounts, self.x_single, self.x_pair),
@@ -488,12 +490,15 @@ class CCMpred():
                 non_contact_indices=self.non_contact_indices,
             )
         }
-
+        '''
         #initialize objective function
-        self.f = OBJ_FUNC[opt.objfun](opt)
-
+        #self.f = OBJ_FUNC[opt.objfun](opt)
+        self.f=pll.PseudoLikelihood(self.msa, self.weights, self.regularization, self.pseudocounts, self.x_single, self.x_pair)
         #initialise optimizer
-        self.alg = ALGORITHMS[opt.objfun](opt)
+        self.alg=lbfgs.LBFGS(
+                self.progress
+            )
+        #self.alg = ALGORITHMS[opt.objfun](opt)
 
         print("\nWill optimize {0} {1} variables wrt {2} \nand {3}".format(
             self.f.x.size, self.f.x.dtype, self.f, self.regularization))

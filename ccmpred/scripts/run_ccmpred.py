@@ -194,14 +194,13 @@ def parse_args():
     return args
 
 
-def main():
+def main(alnfile,outfile,pair_mat):
 
     # read command line options
-    opt = parse_args()
 
     # print logo
-    if opt.logo:
-        ccmpred.logo.logo()
+
+    ccmpred.logo.logo()
 
     # set OMP environment variable for number of threads
     os.environ['OMP_NUM_THREADS'] = str(opt.num_threads)
@@ -211,39 +210,21 @@ def main():
     ccm = CCMpred()
 
     # specify possible file paths
-    ccm.set_alignment_file(opt.alnfile)
-    ccm.set_matfile(opt.matfile)
-    ccm.set_pdb_file(opt.pdbfile)
-    ccm.set_initraw_file(opt.initrawfile)
+    ccm.set_alignment_file(alnfile)
+    ccm.set_matfile(oufile+'.ccmraw')
 
     # read alignment and possible remove gapped sequences and positions
-    ccm.read_alignment(opt.aln_format, opt.max_gap_pos, opt.max_gap_seq)
+    ccm.read_alignment()
 
     # compute sequence weights (in order to reduce sampling bias)
-    ccm.compute_sequence_weights(opt.weight, opt.wt_cutoff)
+    ccm.compute_sequence_weights("simple", 0.8)
 
     # compute amino acid counts and frequencies adding pseudo counts for non-observed amino acids
-    ccm.compute_frequencies(opt.pseudocounts, opt.pseudocount_single,  opt.pseudocount_pair)
+    ccm.compute_frequencies("uniform_pseudocounts")
 
-    # read pdb file if CCMpred is setup as a constrained run
-    if opt.pdbfile:
-        ccm.read_pdb(opt.contact_threshold)
-
-
-    # if alternative scores are specified: compute these and exit
-    if opt.omes:
-        ccm.compute_omes(opt.omes_fodoraldrich)
-        ccm.write_matrix()
-        sys.exit(0)
-
-    if opt.mi:
-        ccm.compute_mutual_info(opt.mi_normalized, opt.mi_pseudocounts)
-        ccm.write_matrix()
-        sys.exit(0)
 
     # setup L2 regularization
-    ccm.specify_regularization(opt.lambda_single, opt.lambda_pair_factor,
-                               reg_type="L2", scaling="L", single_prior=opt.single_prior)
+    ccm.specify_regularization(10, 0.2,pair_mat)
 
     # intialise single and pair potentials either:
     #   - according to regularization priors
@@ -252,15 +233,14 @@ def main():
 
 
     # optimize objective function (pLL or CD/PCD) with optimization algorithm (LBFGS, CG, GD or ADAM)
-    if opt.optimize:
 
-        #initialize log object
-        ccm.initiate_logging(opt.plot_opt_progress)
 
-        #minimize objective function with corresponding optimization algorithm
-        ccm.minimize(opt)
-    else:
-        print("\nDo not optimize but use model parameters provided by {0}\n".format(opt.initrawfile))
+    #initialize log object
+    ccm.initiate_logging()
+
+    #minimize objective function with corresponding optimization algorithm
+    ccm.minimize()
+
 
 
 
@@ -269,33 +249,30 @@ def main():
 
 
     #specify meta data, and write (corrected) contact matrices to files
-    if opt.matfile:
 
-        # Compute contact score (frobenius norm) by recentering potentials
-        # TODO: other scores can be added ...
-        ccm.compute_contact_matrix(recenter_potentials=True, frob=True)
 
-        # compute corrected contact maps (removing entropy/phylogenetic biases)
-        # TODO: other corrections can be added ...
-        ccm.compute_correction(
-            apc_file=opt.apc_file,
-            entropy_correction_file=opt.entropy_correction_file
-        )
+    # Compute contact score (frobenius norm) by recentering potentials
+    # TODO: other scores can be added ...
+    ccm.compute_contact_matrix(recenter_potentials=True, frob=True)
 
-        ccm.write_matrix()
+    # compute corrected contact maps (removing entropy/phylogenetic biases)
+    # TODO: other corrections can be added ...
+    ccm.compute_correction(
+        apc_file=outfile,
+        entropy_correction_file=None
+    )
+
+    ccm.write_matrix()
 
     # write model parameters in binary format
-    if opt.out_binary_raw_file:
-        ccm.write_binary_raw(opt.out_binary_raw_file)
+
 
 
     exitcode = 0
-    if opt.optimize:
-        if ccm.algret['code'] < 0:
-            exitcode =-ccm.algret['code']
+    if ccm.algret['code'] < 0:
+        exitcode =-ccm.algret['code']
     sys.exit(exitcode)
 
 
 
-if __name__ == '__main__':
-    main()
+
